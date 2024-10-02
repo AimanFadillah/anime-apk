@@ -1,10 +1,12 @@
 import 'package:animan/component/CardAnime.dart';
 import 'package:animan/component/PlaceHolderCard.dart';
 import 'package:animan/controller/AnimeController.dart';
+import 'package:animan/controller/EpisodeController.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
+import 'package:shimmer/shimmer.dart';
 
 void main () {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RxInt indexPage = RxInt(0);
-    final List<Widget> pages = [const MyAnime(), const MyEpisode()];
+    final List<Widget> pages = [const MyEpisode(),const MyAnime()];
     final PageController pageController = PageController();
     return Scaffold(
       backgroundColor: const  Color(0xFFC4D7FF),
@@ -55,16 +57,16 @@ class MyApp extends StatelessWidget {
               curve: Curves.easeInOut,
             );
           },
-          indicatorColor: const Color(0xFFFFF4B5),
+          indicatorColor: Colors.white,
           destinations:const [
             NavigationDestination(
               selectedIcon: Icon(Icons.home),
               icon: Icon(Icons.home_outlined),
-              label: 'Home',
+              label: 'Episode',
             ),
             NavigationDestination(
               icon: Badge(child: Icon(Icons.notifications_sharp)),
-              label: 'Notifications',
+              label: 'Anime',
             ),
             NavigationDestination(
               icon: Badge(
@@ -127,8 +129,75 @@ class MyEpisode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("hello Word"),
+    final episodeController = Get.put(EpisodeController());
+    return Obx(() => LazyLoadScrollView(
+      onEndOfPage: () => episodeController.getEpisodeMore(),
+      isLoading: episodeController.loadingStop.value,
+      scrollOffset: 2500,
+      child: ListView(
+        padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+        key: const PageStorageKey<String>("MyEpisodeGrid"),
+        children: [
+          ...episodeController.listEpisode.map((episode) {
+            return Container(
+              padding: const EdgeInsets.all(3),
+              margin:const EdgeInsets.fromLTRB(0,0,0,15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.network(episode.image as String,loadingBuilder: (context,child,progress) {
+                      if(progress == null){
+                        return child;
+                      }
+                     return Image.asset("images/abu4.png");
+                    }),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(episode.title as String,style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold)),
+                        Text(episode.date as String,style: TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            );
+          }),
+
+          if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
+            return Container(
+              padding:const EdgeInsets.all(3),
+              height: 230,
+              margin:const EdgeInsets.fromLTRB(0,0,0,15),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white
+              ),
+              child: Shimmer.fromColors(
+                baseColor:Colors.white, // Warna dasar
+                highlightColor: Colors.grey, // Warna highlight
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    color: Colors.grey[300], // Warna background placeholder
+                  ),
+                ),
+              ),
+            );
+          }),
+
+        ],
+      ),
+    ),
     );
   }
 }
