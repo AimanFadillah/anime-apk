@@ -9,7 +9,7 @@ class PlaceHolderCard extends StatelessWidget{
     return Container(
       padding:const EdgeInsets.symmetric(horizontal: 10),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!, // Warna dasar
+        baseColor: const Color(0xFF87A2FF)!, // Warna dasar
         highlightColor: Colors.white, // Warna highlight
         child: Container(
           decoration: BoxDecoration(

@@ -8,9 +8,9 @@ import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 void main () {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.white, // Setel latar belakang status bar jadi putih
+    statusBarColor: Color(0xFFC4D7FF), // Setel latar belakang status bar jadi putih
     statusBarIconBrightness: Brightness.dark, // Ikon status bar jadi hitam
-    systemNavigationBarColor: Colors.white,
+    systemNavigationBarColor: Color(0xFF87A2FF),
     systemNavigationBarIconBrightness: Brightness.dark
   ));
   runApp(
@@ -34,15 +34,28 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final RxInt indexPage = RxInt(0);
     final List<Widget> pages = [const MyAnime(), const MyEpisode()];
+    final PageController pageController = PageController();
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Obx(() => pages[indexPage.value]),
+      backgroundColor: const  Color(0xFFC4D7FF),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          indexPage.value = index;
+        },
+        children: pages,
+      ),
       bottomNavigationBar: Obx(() => NavigationBar(
+          backgroundColor: const Color(0xFF87A2FF),
           selectedIndex: indexPage.value,
           onDestinationSelected: (int index) {
             indexPage.value = index;
+            pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
           },
-          indicatorColor: Colors.amber,
+          indicatorColor: const Color(0xFFFFF4B5),
           destinations:const [
             NavigationDestination(
               selectedIcon: Icon(Icons.home),
@@ -80,7 +93,7 @@ class MyAnime extends StatelessWidget {
         onEndOfPage: () => animeController.getAnimesMore(),
         scrollOffset: 1300,
         isLoading: animeController.loadingStop.value,
-        child: GridView.count(
+          child: GridView.count(
           crossAxisCount: 2,
           mainAxisSpacing: 15,
           childAspectRatio: 0.8,

@@ -17,7 +17,7 @@ class CardAnime extends StatelessWidget {
             fit: BoxFit.cover, // Isi sesuai kontainer
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
-              return Image.asset("images/abu3.png");
+              return Image.asset("images/biru.png");
             },
             // height: MediaQuery.of(context).size.height * 0.288,
           ),
