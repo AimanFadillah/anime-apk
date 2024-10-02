@@ -31,6 +31,7 @@ dependencies:
   get:
   http:
   shimmer:
+  lazy_load_scrollview:
   flutter:
     sdk: flutter
 

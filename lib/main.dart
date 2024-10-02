@@ -1,10 +1,10 @@
 import 'package:animan/component/CardAnime.dart';
 import 'package:animan/component/PlaceHolderCard.dart';
 import 'package:animan/controller/AnimeController.dart';
-import 'package:animan/model/Anime.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
+import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 void main () {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RxInt indexPage = RxInt(0);
-    final List<Widget> pages = [MyAnime(), MyEpisode()];
+    final List<Widget> pages = [const MyAnime(), const MyEpisode()];
     return Scaffold(
       backgroundColor: Colors.white,
       body: Obx(() => pages[indexPage.value]),
@@ -42,7 +42,6 @@ class MyApp extends StatelessWidget {
           onDestinationSelected: (int index) {
             indexPage.value = index;
           },
-          animationDuration: Duration(seconds: 10),
           indicatorColor: Colors.amber,
           destinations:const [
             NavigationDestination(
@@ -76,37 +75,37 @@ class MyAnime extends StatelessWidget {
     final animeController = Get.put(AnimeController());
     return Container(
       margin: const EdgeInsets.fromLTRB(0,20,0,0),
-      child: Obx(() => animeController.isLoading.value ?
-      GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 15,
-        childAspectRatio: 0.8,
-        key: const PageStorageKey<String>('myAnimeGrid'),
-        children: List.generate(10, (index) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(child: PlaceHolderCard()),
-            ],
-          );
-        }),
-      ) :
-      GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 15,
-        childAspectRatio: 0.8,
-        key: const PageStorageKey<String>('myAnimeGrid'),
-        children:animeController.listAnime.map((anime) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(child: CardAnime(nama: anime.title as String, image: anime.image as String)),
-            ],
-          );
-        }).toList(),
+      child: Obx(() =>
+      LazyLoadScrollView(
+        onEndOfPage: () => animeController.getAnimesMore(),
+        scrollOffset: 1300,
+        isLoading: animeController.loadingStop.value,
+        child: GridView.count(
+          crossAxisCount: 2,
+          mainAxisSpacing: 15,
+          childAspectRatio: 0.8,
+          key: const PageStorageKey<String>('myAnimeGrid'),
+          children:[
+            ...animeController.listAnime.map((anime) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(child: CardAnime(nama: anime.title as String, image: anime.image as String)),
+                ],
+              );
+            }),
+            if(!animeController.loadingStop.value) ...List.generate(10, (index) {
+                return const Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: PlaceHolderCard()),
+                  ],
+                );
+            })
+          ],
+        ),
       ),
-      ),
-    );
+    ));
   }
 }
 
