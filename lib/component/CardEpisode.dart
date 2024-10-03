@@ -22,7 +22,7 @@ class CardEpisode extends StatelessWidget{
               width: MediaQuery.of(context).size.width,
               height: 230,
               child: Transform.scale(
-                scale: 1.1,
+                scale: 1.02,
                 child: Image.network(episode.image as String,
                   fit: BoxFit.cover,
                   loadingBuilder: (context,image,progress){
@@ -30,7 +30,7 @@ class CardEpisode extends StatelessWidget{
                       return image;
                     }
                 
-                    return Image.asset("images/abu4.png");
+                    return Image.asset("images/abu4.png", fit:BoxFit.cover);
                   },
                 ),
               )
