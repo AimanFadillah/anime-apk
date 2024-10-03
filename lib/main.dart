@@ -1,5 +1,7 @@
 import 'package:animan/component/CardAnime.dart';
+import 'package:animan/component/CardEpisode.dart';
 import 'package:animan/component/PlaceHolderCard.dart';
+import 'package:animan/component/PlaceHolderEpisode.dart';
 import 'package:animan/controller/AnimeController.dart';
 import 'package:animan/controller/EpisodeController.dart';
 import "package:flutter/material.dart";
@@ -105,7 +107,7 @@ class MyAnime extends StatelessWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(child: CardAnime(nama: anime.title as String, image: anime.image as String)),
+                Expanded(child: CardAnime(anime: anime)),
                 ],
               );
             }),
@@ -133,66 +135,17 @@ class MyEpisode extends StatelessWidget {
     return Obx(() => LazyLoadScrollView(
       onEndOfPage: () => episodeController.getEpisodeMore(),
       isLoading: episodeController.loadingStop.value,
-      scrollOffset: 2500,
+      scrollOffset: 2300,
       child: ListView(
         padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
         key: const PageStorageKey<String>("MyEpisodeGrid"),
         children: [
           ...episodeController.listEpisode.map((episode) {
-            return Container(
-              padding: const EdgeInsets.all(3),
-              margin:const EdgeInsets.fromLTRB(0,0,0,15),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(episode.image as String,loadingBuilder: (context,child,progress) {
-                      if(progress == null){
-                        return child;
-                      }
-                     return Image.asset("images/abu4.png");
-                    }),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(episode.title as String,style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold)),
-                        Text(episode.date as String,style: TextStyle(fontSize: 10)),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            );
+            return CardEpisode(episode: episode);
           }),
 
           if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
-            return Container(
-              padding:const EdgeInsets.all(3),
-              height: 230,
-              margin:const EdgeInsets.fromLTRB(0,0,0,15),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.white
-              ),
-              child: Shimmer.fromColors(
-                baseColor:Colors.white, // Warna dasar
-                highlightColor: Colors.grey, // Warna highlight
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: Colors.grey[300], // Warna background placeholder
-                  ),
-                ),
-              ),
-            );
+            return const PlaceHolderEpisode();
           }),
 
         ],

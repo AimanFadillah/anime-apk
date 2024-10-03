@@ -1,10 +1,10 @@
 import 'package:animan/component/PlaceHolderCard.dart';
+import 'package:animan/model/Anime.dart';
 import 'package:flutter/material.dart';
 
 class CardAnime extends StatelessWidget {
-  final String nama;
-  final String image;
-  const CardAnime({required this.nama,required this.image,super.key});
+  final Anime anime;
+  const CardAnime({required this.anime,super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +12,18 @@ class CardAnime extends StatelessWidget {
       borderRadius: BorderRadius.circular(6),
       child: Stack(
         children: [
-          Image.network(
-            image,
-            fit: BoxFit.cover, // Isi sesuai kontainer
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Image.asset("images/biru.png");
-            },
-            // height: MediaQuery.of(context).size.height * 0.288,
+          SizedBox(
+            width: MediaQuery.of(context).size.width / 2.2,
+            height: 300,
+            child: Image.network(
+              anime.image as String,
+              fit: BoxFit.cover, // Isi sesuai kontainer
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Image.asset("images/biru.png",fit: BoxFit.cover);
+              },
+              // height: MediaQuery.of(context).size.height * 0.288,
+            ),
           ),
           Positioned(
             bottom: 0, // Posisi teks di bawah gambar
@@ -31,7 +35,7 @@ class CardAnime extends StatelessWidget {
                 color: Colors.black.withOpacity(0.6),
               ),
               child: Text(
-                truncateText(nama,cutoff: 19),
+                truncateText(anime.title as String,cutoff: 19),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
