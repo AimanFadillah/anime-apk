@@ -31,6 +31,9 @@ dependencies:
   get:
   http:
   shimmer:
+  webview_flutter:
+  webview_flutter_android:
+  webview_flutter_wkwebview:
   lazy_load_scrollview:
   flutter:
     sdk: flutter

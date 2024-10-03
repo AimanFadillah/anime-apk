@@ -4,13 +4,24 @@ import 'package:animan/component/PlaceHolderCard.dart';
 import 'package:animan/component/PlaceHolderEpisode.dart';
 import 'package:animan/controller/AnimeController.dart';
 import 'package:animan/controller/EpisodeController.dart';
+import 'package:animan/page/ShowEpisode.dart';
+import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 void main () {
+  if (WebViewPlatform.instance == null) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      WebViewPlatform.instance = AndroidWebViewPlatform();
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      WebViewPlatform.instance = WebKitWebViewPlatform();
+    }
+  }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Color(0xFFC4D7FF), // Setel latar belakang status bar jadi putih
     statusBarIconBrightness: Brightness.dark, // Ikon status bar jadi hitam
@@ -24,7 +35,8 @@ void main () {
         debugShowCheckedModeBanner: false,
         initialRoute: "/",
         getPages: [
-          GetPage(name: "/", page: () => const MyApp())
+          GetPage(name: "/", page: () => const MyApp()),
+          GetPage(name: "/episode/:slug", page:() => const ShowEpisode())
         ],
       )
     )
