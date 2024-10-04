@@ -34,7 +34,7 @@ class CardEpisode extends StatelessWidget{
                         return image;
                       }
 
-                      return Image.asset("images/abu4.png", fit:BoxFit.cover);
+                      return Image.asset("images/biru2.png", fit:BoxFit.cover);
                     },
                   ),
                 )
