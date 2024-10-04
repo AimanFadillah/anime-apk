@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:animan/model/Streaming.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import "package:http/http.dart" as http;
 import 'package:animan/model/LinkIframe.dart';
@@ -38,7 +39,19 @@ class StreamingController extends GetxController {
             // Update loading bar.
           },
           onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
+          onPageFinished: (String url) {
+            webViewController.value.runJavaScript(
+                """
+                document.addEventListener('fullscreenchange', function(e) {
+                  if (document.fullscreenElement) {
+                    FlutterChannel.postMessage('fullscreen');
+                  }else{
+                    FlutterChannel.postMessage('fullscreen_no');
+                  }
+                });
+                """
+            );
+          },
           onHttpError: (HttpResponseError error) {},
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
@@ -47,9 +60,27 @@ class StreamingController extends GetxController {
             }
             return NavigationDecision.navigate;
           },
-        ),
-      )
-      ..loadRequest(Uri.parse(linkStreaming.value));
+          ),
+        )
+        ..addJavaScriptChannel("FlutterChannel", onMessageReceived: (JavaScriptMessage server) {
+          if(server.message == "fullscreen"){
+            print("SIKATTT");
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeLeft,
+            ]);
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+          }
+
+          if(server.message == "fullscreen_no"){
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.portraitDown,
+            ]);
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+          }
+        })
+        ..loadRequest(Uri.parse(linkStreaming.value));
     }catch(e){
       print(e);
     }
