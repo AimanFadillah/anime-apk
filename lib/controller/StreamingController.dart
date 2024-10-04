@@ -27,7 +27,7 @@ class StreamingController extends GetxController {
     try{
       final response = await http.get(Uri.parse("https://samehadaku-api-man.vercel.app/episode/$slug"));
       show.value = Streaming.fromJson(jsonDecode(response.body));
-      final data = show.value.iframe?[show.value.iframe!.length - 4];
+      final data = show.value.iframe?[show.value.iframe!.length - 7];
       final responseIframe =  await http.get(Uri.parse("https://samehadaku-api-man.vercel.app/iframe?post=${data?.post}&nume=${data?.nume}"));
       final LinkIframe jsonIframe = LinkIframe.fromJson(jsonDecode(responseIframe.body));
       linkStreaming.value = jsonIframe.iframe!;
@@ -55,16 +55,12 @@ class StreamingController extends GetxController {
           onHttpError: (HttpResponseError error) {},
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
+            return NavigationDecision.prevent;
           },
           ),
         )
         ..addJavaScriptChannel("FlutterChannel", onMessageReceived: (JavaScriptMessage server) {
           if(server.message == "fullscreen"){
-            print("SIKATTT");
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.landscapeLeft,
               DeviceOrientation.landscapeLeft,
