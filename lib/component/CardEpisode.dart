@@ -16,7 +16,15 @@ class CardEpisode extends StatelessWidget{
         margin:const EdgeInsets.fromLTRB(0,0,0,15),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.white
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.8), // Warna bayangan
+                spreadRadius: 2, // Radius penyebaran bayangan
+                blurRadius: 7,   // Radius blur bayangan
+                offset:const Offset(0, 3), // Geser posisi bayangan (x, y)
+              ),
+            ],
         ),
         child: Stack(
           children: [

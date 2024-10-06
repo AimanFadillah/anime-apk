@@ -1,3 +1,4 @@
+import 'package:animan/model/Episode.dart';
 import 'package:animan/model/Quality.dart';
 
 class Streaming {
@@ -84,28 +85,6 @@ class Genre {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['title'] = this.title;
-    data['slug'] = this.slug;
-    return data;
-  }
-}
-
-class Episode {
-  String? title;
-  String? date;
-  String? slug;
-
-  Episode({this.title, this.date, this.slug});
-
-  Episode.fromJson(Map<String, dynamic> json) {
-    title = json['title'];
-    date = json['date'];
-    slug = json['slug'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['title'] = this.title;
-    data['date'] = this.date;
     data['slug'] = this.slug;
     return data;
   }

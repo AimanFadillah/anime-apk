@@ -23,22 +23,20 @@ void main () {
     }
   }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Color(0xFFC4D7FF), // Setel latar belakang status bar jadi putih
+    statusBarColor: Colors.white, // Setel latar belakang status bar jadi putih
     statusBarIconBrightness: Brightness.dark, // Ikon status bar jadi hitam
     systemNavigationBarColor: Color(0xFF87A2FF),
     systemNavigationBarIconBrightness: Brightness.dark
   ));
   runApp(
-    SafeArea(child:
-      GetMaterialApp(
-        title: "Homepage",
-        debugShowCheckedModeBanner: false,
-        initialRoute: "/",
-        getPages: [
-          GetPage(name: "/", page: () => const MyApp()),
-          GetPage(name: "/episode/:slug", page:() => const ShowEpisode())
-        ],
-      )
+    GetMaterialApp(
+      title: "Homepage",
+      debugShowCheckedModeBanner: false,
+      initialRoute: "/",
+      getPages: [
+        GetPage(name: "/", page: () => const MyApp()),
+        GetPage(name: "/episode/:slug", page:() => const ShowEpisode())
+      ],
     )
   );
 }
@@ -52,7 +50,7 @@ class MyApp extends StatelessWidget {
     final List<Widget> pages = [const MyEpisode(),const MyAnime()];
     final PageController pageController = PageController();
     return Scaffold(
-      backgroundColor: const  Color(0xFFC4D7FF),
+      backgroundColor: Colors.white,
       body: PageView(
         controller: pageController,
         onPageChanged: (index) {
@@ -144,25 +142,28 @@ class MyEpisode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final episodeController = Get.put(EpisodeController());
-    return Obx(() => LazyLoadScrollView(
-      onEndOfPage: () => episodeController.getEpisodeMore(),
-      isLoading: episodeController.loadingStop.value,
-      scrollOffset: 2300,
-      child: ListView(
-        padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-        key: const PageStorageKey<String>("MyEpisodeGrid"),
-        children: [
-          ...episodeController.listEpisode.map((episode) {
-            return CardEpisode(episode: episode);
-          }),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0,30,0,0),
+      child: Obx(() => LazyLoadScrollView(
+        onEndOfPage: () => episodeController.getEpisodeMore(),
+        isLoading: episodeController.loadingStop.value,
+        scrollOffset: 2300,
+        child: ListView(
+          padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+          key: const PageStorageKey<String>("MyEpisodeGrid"),
+          children: [
+            ...episodeController.listEpisode.map((episode) {
+              return CardEpisode(episode: episode);
+            }),
 
-          if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
-            return const PlaceHolderEpisode();
-          }),
+            if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
+              return const PlaceHolderEpisode();
+            }),
 
-        ],
+          ],
+        ),
       ),
-    ),
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 class StreamingController extends GetxController {
   Rx<WebViewController> webViewController = Rx<WebViewController>(WebViewController());
   RxString linkStreaming = RxString("");
+  RxInt indexIframe = RxInt(0);
   Rx<Streaming> show = Rx<Streaming>(
     Streaming(
       title: "",
@@ -26,22 +27,31 @@ class StreamingController extends GetxController {
   getStreaming ({required String slug}) async {
     try{
       final response = await http.get(Uri.parse("https://samehadaku-api-man.vercel.app/episode/$slug"));
+      indexIframe.value = 0;
       show.value = Streaming.fromJson(jsonDecode(response.body));
-      final data = show.value.iframe?[show.value.iframe!.length - 7];
+      getIframe(index:indexIframe.value);
+    }catch(e){
+      print(e);
+    }
+  }
+
+  getIframe ({required int index}) async {
+    try{
+      final data = show.value.iframe?[index];
       final responseIframe =  await http.get(Uri.parse("https://samehadaku-api-man.vercel.app/iframe?post=${data?.post}&nume=${data?.nume}"));
       final LinkIframe jsonIframe = LinkIframe.fromJson(jsonDecode(responseIframe.body));
-      linkStreaming.value = jsonIframe.iframe!;
+      final linkStreaming = jsonIframe.iframe!;
       webViewController.value
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar.
-          },
-          onPageStarted: (String url) {},
-          onPageFinished: (String url) {
-            webViewController.value.runJavaScript(
-                """
+          NavigationDelegate(
+            onProgress: (int progress) {
+              // Update loading bar.
+            },
+            onPageStarted: (String url) {},
+            onPageFinished: (String url) {
+              webViewController.value.runJavaScript(
+                  """
                 document.addEventListener('fullscreenchange', function(e) {
                   if (document.fullscreenElement) {
                     FlutterChannel.postMessage('fullscreen');
@@ -50,22 +60,21 @@ class StreamingController extends GetxController {
                   }
                 });
                 """
-            );
-          },
-          onHttpError: (HttpResponseError error) {},
-          onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            return NavigationDecision.prevent;
-          },
+              );
+            },
+            onHttpError: (HttpResponseError error) {},
+            onWebResourceError: (WebResourceError error) {},
+            onNavigationRequest: (NavigationRequest request) {
+              return NavigationDecision.prevent;
+            },
           ),
-        )
-        ..addJavaScriptChannel("FlutterChannel", onMessageReceived: (JavaScriptMessage server) {
+        )..addJavaScriptChannel("FlutterChannel", onMessageReceived: (JavaScriptMessage server) {
           if(server.message == "fullscreen"){
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.landscapeLeft,
               DeviceOrientation.landscapeLeft,
             ]);
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
           }
 
           if(server.message == "fullscreen_no"){
@@ -74,9 +83,10 @@ class StreamingController extends GetxController {
               DeviceOrientation.portraitDown,
             ]);
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
           }
         })
-        ..loadRequest(Uri.parse(linkStreaming.value));
+        ..loadRequest(Uri.parse(linkStreaming));
     }catch(e){
       print(e);
     }
