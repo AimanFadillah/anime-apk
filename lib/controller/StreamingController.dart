@@ -19,6 +19,8 @@ class StreamingController extends GetxController {
       slug: "",
       image: "",
       synopsis: "",
+      previousStreaming:"",
+      nextStreaming:"",
       genre: [],
       episode: [],
       downloads: null,

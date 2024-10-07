@@ -4,13 +4,14 @@ import 'package:get/get.dart';
 
 class CardEpisode extends StatelessWidget{
   final Episode episode;
-  const CardEpisode ({required this.episode,super.key});
+  final Function onTap;
+  const CardEpisode ({required this.episode,required this.onTap,super.key});
   
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.toNamed("/episode/${episode.slug}");
+        onTap();
       },
       child: Container(
         margin:const EdgeInsets.fromLTRB(0,0,0,15),

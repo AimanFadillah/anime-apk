@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:animan/component/CardAnime.dart';
 import 'package:animan/controller/StreamingController.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +29,9 @@ class MyStreaming extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final streamingController = Get.put(StreamingController());
+    ScrollController scrollController = ScrollController();
     return SingleChildScrollView(
+      controller: scrollController,
       child: Container(
         margin:const EdgeInsets.fromLTRB(0, 30, 0, 0),
         child: Column(
@@ -166,7 +170,7 @@ class MyStreaming extends StatelessWidget {
                           Container(
                             margin:const EdgeInsets.symmetric(horizontal: 8),
                             child: Obx(() =>
-                              Text(truncateText(streamingController.show.value.anime as String,cutoff: 30),
+                              Text(truncateText(streamingController.show.value.anime as String,cutoff: 28),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600
@@ -201,19 +205,45 @@ class MyStreaming extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.fromLTRB(10,15,10,0),
                   width: MediaQuery.of(context).size.width,
-                  child: Obx(() => Column(
+                  child: Obx(() {
+                    final filteredEpisodes = streamingController.show.value.episode
+                        ?.where((episode) =>
+                    episode.slug != Get.parameters["slug"] &&
+                        episode.slug != streamingController.show.value.previousStreaming &&
+                        episode.slug != streamingController.show.value.nextStreaming)
+                        .toList();
+
+                    filteredEpisodes?.shuffle(Random());
+
+                    void changeEpisode (String slug) {
+                      Get.parameters["slug"] = slug;
+                      streamingController.getStreaming(slug: slug);
+                      scrollController.jumpTo(0);
+                    }
+
+                    return Column(
                       children: [
+                        ...?streamingController.show.value.episode?.where((episode) => episode.slug == streamingController.show.value.nextStreaming).map((episode) {
+                            return CardEpisode(episode: episode,onTap:() {
+                              changeEpisode(episode.slug as String);
+                            });
+                        }),
 
-                        ...?streamingController.show.value.episode?.reversed.map((episode) {
-                          return CardEpisode(episode: episode);
-                        })
+                        ...?streamingController.show.value.episode?.where((episode) => episode.slug == streamingController.show.value.previousStreaming).map((episode) {
+                            return CardEpisode(episode: episode,onTap:() {
+                              changeEpisode(episode.slug as String);
+                            });
+                        }),
 
+                        ...?filteredEpisodes?.map((episode) {
+                          return CardEpisode(episode: episode,onTap:() {
+                            changeEpisode(episode.slug as String);
+                          });
+                        }),
                       ],
-                    ),
-                  ),
+                    );
+                  }),
                 )
-      
-      
               ],
             )
       ),

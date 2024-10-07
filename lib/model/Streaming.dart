@@ -7,6 +7,8 @@ class Streaming {
   String? slug;
   String? image;
   String? synopsis;
+  String? previousStreaming;
+  String? nextStreaming;
   List<Genre>? genre;
   List<Episode>? episode;
   Downloads? downloads;
@@ -19,6 +21,8 @@ class Streaming {
         this.slug,
         this.image,
         this.synopsis,
+        this.previousStreaming,
+        this.nextStreaming,
         this.genre,
         this.episode,
         this.downloads,
@@ -30,6 +34,8 @@ class Streaming {
     slug = json['slug'];
     image = json['image'];
     synopsis = json['synopsis'];
+    previousStreaming = json["previousStreaming"];
+    nextStreaming = json["nextStreaming"];
     if (json['genre'] != null) {
       genre = <Genre>[];
       json['genre'].forEach((v) {
@@ -60,6 +66,8 @@ class Streaming {
     data['slug'] = this.slug;
     data['image'] = this.image;
     data['synopsis'] = this.synopsis;
+    data["previousStreaming"] = this.previousStreaming;
+    data["nextStreaming"] = this.nextStreaming;
     if (this.genre != null) {
       data['genre'] = this.genre!.map((v) => v.toJson()).toList();
     }

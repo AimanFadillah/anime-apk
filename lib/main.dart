@@ -153,7 +153,9 @@ class MyEpisode extends StatelessWidget {
           key: const PageStorageKey<String>("MyEpisodeGrid"),
           children: [
             ...episodeController.listEpisode.map((episode) {
-              return CardEpisode(episode: episode);
+              return CardEpisode(episode: episode,onTap: () {
+                Get.toNamed("/episode/${episode.slug}");
+              });
             }),
 
             if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
