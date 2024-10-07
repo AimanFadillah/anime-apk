@@ -11,8 +11,10 @@ class StreamingController extends GetxController {
   Rx<WebViewController> webViewController = Rx<WebViewController>(WebViewController());
   RxString linkStreaming = RxString("");
   RxInt indexIframe = RxInt(0);
+  RxBool isLoadingIframe = RxBool(false);
   Rx<Streaming> show = Rx<Streaming>(
     Streaming(
+      anime: "",
       title: "",
       slug: "",
       image: "",
@@ -37,12 +39,18 @@ class StreamingController extends GetxController {
 
   getIframe ({required int index}) async {
     try{
+      if(isLoadingIframe.value == true) {
+        return;
+      }
+      isLoadingIframe.value = true;
+      indexIframe.value = index;
       final data = show.value.iframe?[index];
       final responseIframe =  await http.get(Uri.parse("https://samehadaku-api-man.vercel.app/iframe?post=${data?.post}&nume=${data?.nume}"));
       final LinkIframe jsonIframe = LinkIframe.fromJson(jsonDecode(responseIframe.body));
       final linkStreaming = jsonIframe.iframe!;
       webViewController.value
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..enableZoom(false)
         ..setNavigationDelegate(
           NavigationDelegate(
             onProgress: (int progress) {
@@ -50,6 +58,7 @@ class StreamingController extends GetxController {
             },
             onPageStarted: (String url) {},
             onPageFinished: (String url) {
+              isLoadingIframe.value = false;
               webViewController.value.runJavaScript(
                   """
                 document.addEventListener('fullscreenchange', function(e) {

@@ -2,6 +2,7 @@ import 'package:animan/model/Episode.dart';
 import 'package:animan/model/Quality.dart';
 
 class Streaming {
+  String? anime;
   String? title;
   String? slug;
   String? image;
@@ -12,7 +13,9 @@ class Streaming {
   List<Iframe>? iframe;
 
   Streaming(
-      {this.title,
+      {
+        this.anime,
+        this.title,
         this.slug,
         this.image,
         this.synopsis,
@@ -22,6 +25,7 @@ class Streaming {
         this.iframe});
 
   Streaming.fromJson(Map<String, dynamic> json) {
+    anime = json["anime"];
     title = json['title'];
     slug = json['slug'];
     image = json['image'];
@@ -51,6 +55,7 @@ class Streaming {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["anime"] = this.anime;
     data['title'] = this.title;
     data['slug'] = this.slug;
     data['image'] = this.image;

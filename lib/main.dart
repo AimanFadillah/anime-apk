@@ -25,7 +25,7 @@ void main () {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.white, // Setel latar belakang status bar jadi putih
     statusBarIconBrightness: Brightness.dark, // Ikon status bar jadi hitam
-    systemNavigationBarColor: Color(0xFF87A2FF),
+    systemNavigationBarColor: Colors.white,
     systemNavigationBarIconBrightness: Brightness.dark
   ));
   runApp(
@@ -59,7 +59,8 @@ class MyApp extends StatelessWidget {
         children: pages,
       ),
       bottomNavigationBar: Obx(() => NavigationBar(
-          backgroundColor: const Color(0xFF87A2FF),
+          backgroundColor: Colors.white,
+          indicatorColor: const Color(0xFF87A2FF),
           selectedIndex: indexPage.value,
           onDestinationSelected: (int index) {
             indexPage.value = index;
@@ -69,7 +70,6 @@ class MyApp extends StatelessWidget {
               curve: Curves.easeInOut,
             );
           },
-          indicatorColor: Colors.white,
           destinations:const [
             NavigationDestination(
               selectedIcon: Icon(Icons.home),
