@@ -1,30 +1,41 @@
+import 'package:animan/model/Episode.dart';
 import 'package:animan/model/Quality.dart';
 
 class Streaming {
+  String? anime;
   String? title;
   String? slug;
   String? image;
   String? synopsis;
+  String? previousStreaming;
+  String? nextStreaming;
   List<Genre>? genre;
   List<Episode>? episode;
   Downloads? downloads;
   List<Iframe>? iframe;
 
   Streaming(
-      {this.title,
+      {
+        this.anime,
+        this.title,
         this.slug,
         this.image,
         this.synopsis,
+        this.previousStreaming,
+        this.nextStreaming,
         this.genre,
         this.episode,
         this.downloads,
         this.iframe});
 
   Streaming.fromJson(Map<String, dynamic> json) {
+    anime = json["anime"];
     title = json['title'];
     slug = json['slug'];
     image = json['image'];
     synopsis = json['synopsis'];
+    previousStreaming = json["previousStreaming"];
+    nextStreaming = json["nextStreaming"];
     if (json['genre'] != null) {
       genre = <Genre>[];
       json['genre'].forEach((v) {
@@ -50,10 +61,13 @@ class Streaming {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data["anime"] = this.anime;
     data['title'] = this.title;
     data['slug'] = this.slug;
     data['image'] = this.image;
     data['synopsis'] = this.synopsis;
+    data["previousStreaming"] = this.previousStreaming;
+    data["nextStreaming"] = this.nextStreaming;
     if (this.genre != null) {
       data['genre'] = this.genre!.map((v) => v.toJson()).toList();
     }
@@ -84,28 +98,6 @@ class Genre {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['title'] = this.title;
-    data['slug'] = this.slug;
-    return data;
-  }
-}
-
-class Episode {
-  String? title;
-  String? date;
-  String? slug;
-
-  Episode({this.title, this.date, this.slug});
-
-  Episode.fromJson(Map<String, dynamic> json) {
-    title = json['title'];
-    date = json['date'];
-    slug = json['slug'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['title'] = this.title;
-    data['date'] = this.date;
     data['slug'] = this.slug;
     return data;
   }

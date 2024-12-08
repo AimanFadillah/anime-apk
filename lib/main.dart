@@ -4,29 +4,39 @@ import 'package:animan/component/PlaceHolderCard.dart';
 import 'package:animan/component/PlaceHolderEpisode.dart';
 import 'package:animan/controller/AnimeController.dart';
 import 'package:animan/controller/EpisodeController.dart';
+import 'package:animan/page/ShowEpisode.dart';
+import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 void main () {
+  if (WebViewPlatform.instance == null) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      WebViewPlatform.instance = AndroidWebViewPlatform();
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      WebViewPlatform.instance = WebKitWebViewPlatform();
+    }
+  }
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Color(0xFFC4D7FF), // Setel latar belakang status bar jadi putih
+    statusBarColor: Colors.white, // Setel latar belakang status bar jadi putih
     statusBarIconBrightness: Brightness.dark, // Ikon status bar jadi hitam
-    systemNavigationBarColor: Color(0xFF87A2FF),
+    systemNavigationBarColor: Colors.white,
     systemNavigationBarIconBrightness: Brightness.dark
   ));
   runApp(
-    SafeArea(child:
-      GetMaterialApp(
-        title: "Homepage",
-        debugShowCheckedModeBanner: false,
-        initialRoute: "/",
-        getPages: [
-          GetPage(name: "/", page: () => const MyApp())
-        ],
-      )
+    GetMaterialApp(
+      title: "Homepage",
+      debugShowCheckedModeBanner: false,
+      initialRoute: "/",
+      getPages: [
+        GetPage(name: "/", page: () => const MyApp()),
+        GetPage(name: "/episode/:slug", page:() => const ShowEpisode())
+      ],
     )
   );
 }
@@ -40,7 +50,7 @@ class MyApp extends StatelessWidget {
     final List<Widget> pages = [const MyEpisode(),const MyAnime()];
     final PageController pageController = PageController();
     return Scaffold(
-      backgroundColor: const  Color(0xFFC4D7FF),
+      backgroundColor: Colors.white,
       body: PageView(
         controller: pageController,
         onPageChanged: (index) {
@@ -49,7 +59,8 @@ class MyApp extends StatelessWidget {
         children: pages,
       ),
       bottomNavigationBar: Obx(() => NavigationBar(
-          backgroundColor: const Color(0xFF87A2FF),
+          backgroundColor: Colors.white,
+          indicatorColor: const Color(0xFF87A2FF),
           selectedIndex: indexPage.value,
           onDestinationSelected: (int index) {
             indexPage.value = index;
@@ -59,7 +70,6 @@ class MyApp extends StatelessWidget {
               curve: Curves.easeInOut,
             );
           },
-          indicatorColor: Colors.white,
           destinations:const [
             NavigationDestination(
               selectedIcon: Icon(Icons.home),
@@ -132,25 +142,30 @@ class MyEpisode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final episodeController = Get.put(EpisodeController());
-    return Obx(() => LazyLoadScrollView(
-      onEndOfPage: () => episodeController.getEpisodeMore(),
-      isLoading: episodeController.loadingStop.value,
-      scrollOffset: 2300,
-      child: ListView(
-        padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-        key: const PageStorageKey<String>("MyEpisodeGrid"),
-        children: [
-          ...episodeController.listEpisode.map((episode) {
-            return CardEpisode(episode: episode);
-          }),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0,30,0,0),
+      child: Obx(() => LazyLoadScrollView(
+        onEndOfPage: () => episodeController.getEpisodeMore(),
+        isLoading: episodeController.loadingStop.value,
+        scrollOffset: 2300,
+        child: ListView(
+          padding:const EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+          key: const PageStorageKey<String>("MyEpisodeGrid"),
+          children: [
+            ...episodeController.listEpisode.map((episode) {
+              return CardEpisode(episode: episode,onTap: () {
+                Get.toNamed("/episode/${episode.slug}");
+              });
+            }),
 
-          if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
-            return const PlaceHolderEpisode();
-          }),
+            if(!episodeController.loadingStop.value) ...List.generate(10, (index) {
+              return const PlaceHolderEpisode();
+            }),
 
-        ],
+          ],
+        ),
       ),
-    ),
+      ),
     );
   }
 }
